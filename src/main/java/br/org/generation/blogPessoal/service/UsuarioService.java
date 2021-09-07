@@ -78,26 +78,27 @@ public class UsuarioService {
 		
 	}
 	
-	public Optional<UsuarioLogin> Logar(Optional<UsuarioLogin> usuarioLogin) {
+	public Optional<UsuarioLogin> Logar(Optional<UsuarioLogin> user) {
 
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		Optional<Usuario> usuario = usuarioRepository.findByUsuario(usuarioLogin.get().getUsuario());
+		Optional<Usuario> usuario = usuarioRepository.findByUsuario(user.get().getUsuario());
 
 		if (usuario.isPresent()) {
 			
-			if (encoder.matches(usuarioLogin.get().getSenha(), usuario.get().getSenha())) {
+			if (encoder.matches(user.get().getSenha(), usuario.get().getSenha())) {
 
-				String auth = usuarioLogin.get().getUsuario() + ":" + usuarioLogin.get().getSenha();
+				String auth = user.get().getUsuario() + ":" + user.get().getSenha();
 				byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
 				String authHeader = "Basic " + new String(encodedAuth);
 
-				usuarioLogin.get().setId(usuario.get().getId());
-				usuarioLogin.get().setNome(usuario.get().getNome());
-				usuarioLogin.get().setSenha(usuario.get().getSenha());
-				usuarioLogin.get().setTipo(usuario.get().getTipo());
-				usuarioLogin.get().setFoto(usuario.get().getFoto());
-				usuarioLogin.get().setToken(authHeader);
-				return usuarioLogin;
+				user.get().setToken(authHeader);
+				user.get().setId(usuario.get().getId());
+				user.get().setNome(usuario.get().getNome());
+				user.get().setSenha(usuario.get().getSenha());
+				user.get().setTipo(usuario.get().getTipo());
+				user.get().setFoto(usuario.get().getFoto());
+				
+				return user;
 
 			}
 		}
@@ -106,5 +107,6 @@ public class UsuarioService {
 				HttpStatus.UNAUTHORIZED, "Usuário ou senha inválidos!", null);
 		
 	}
+	
 
 }
